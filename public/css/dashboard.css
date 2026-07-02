@@ -1,0 +1,459 @@
+/* ============================================================
+   Dashboard Panel — Right Sidebar Cards & Stats
+   ============================================================ */
+
+/* ── Dashboard Content Container ── */
+.dash-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dash-content::-webkit-scrollbar {
+  width: 3px;
+}
+.dash-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dash-content::-webkit-scrollbar-thumb {
+  background: var(--bg-hover);
+  border-radius: 3px;
+}
+
+/* ── Section ── */
+.dash-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.dash-section-title {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 0 var(--space-1);
+  margin-bottom: 2px;
+}
+
+/* ── Card ── */
+.dash-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dash-card:hover {
+  border-color: var(--border-default);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dash-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  user-select: none;
+}
+
+.dash-card-icon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dash-card-title {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-card-badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--bg-hover);
+  color: var(--text-tertiary);
+  font-weight: 500;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.dash-card-body {
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ── Stat Row ── */
+.dash-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.dash-stat-icon {
+  font-size: 10px;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.dash-stat-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-stat-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  flex-shrink: 0;
+  min-width: 24px;
+  transition: color 0.3s;
+}
+
+/* Animated count-up */
+.dash-stat-value.animating {
+  color: var(--accent-hover);
+}
+
+/* ── Stat Grid (for category breakdowns) ── */
+.dash-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+  padding-top: 2px;
+}
+
+.dash-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2) var(--space-1);
+  background: var(--bg-ground);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dash-grid-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+}
+
+.dash-grid-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.dash-grid-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.dash-grid-label {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ── Status Dot ── */
+.dash-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.dash-status-dot.online {
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+}
+
+.dash-status-dot.offline {
+  background: var(--text-tertiary);
+}
+
+.dash-status-dot.error {
+  background: var(--danger);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+/* ── Connection Info Row ── */
+.dash-conn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  padding: 1px 0;
+}
+
+.dash-conn-row .dash-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dash-conn-row .dash-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+/* ── Tab List (mini) ── */
+.dash-tab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.dash-tab-list::-webkit-scrollbar {
+  width: 2px;
+}
+.dash-tab-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dash-tab-list::-webkit-scrollbar-thumb {
+  background: var(--bg-hover);
+  border-radius: 2px;
+}
+
+.dash-tab-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  transition: background 0.12s;
+  cursor: pointer;
+}
+
+.dash-tab-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.dash-tab-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+}
+
+.dash-tab-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-tab-status {
+  font-size: 8px;
+  color: var(--text-tertiary);
+}
+
+/* ── Empty state ── */
+.dash-empty {
+  text-align: center;
+  padding: var(--space-3);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* ── Animated counter ── */
+@keyframes dash-count-up {
+  from { opacity: 0.6; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.dash-countup {
+  animation: dash-count-up 0.3s var(--ease-out);
+}
+
+/* ── Progress bar ── */
+.dash-progress {
+  width: 100%;
+  height: 3px;
+  background: var(--bg-hover);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: var(--space-1);
+}
+
+.dash-progress-bar {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent-gradient);
+  transition: width 0.6s var(--ease-out);
+}
+
+/* ============================================================
+   Project Analysis Card
+   ============================================================ */
+
+/* Type distribution mini grid */
+.dash-project-type-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  margin: 4px 0 2px;
+}
+
+.dash-project-type-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 2px;
+  background: var(--bg-ground);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.dash-project-type-icon {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.dash-project-type-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.dash-project-type-label {
+  font-size: 7px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+/* Key files section */
+.dash-project-section-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin: 4px 0 3px;
+}
+
+.dash-project-keyfiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.dash-project-kf-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--bg-ground);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 9px;
+  cursor: default;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.dash-project-kf-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+}
+
+.dash-project-kf-name {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-project-kf-label {
+  color: var(--accent);
+  font-size: 8px;
+  background: rgba(99,102,241,0.1);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+/* Refresh button */
+.dash-project-refresh-btn {
+  margin-top: 6px;
+  padding: 3px 8px;
+  font-size: 9px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  align-self: flex-start;
+}
+
+.dash-project-refresh-btn:hover {
+  background: var(--bg-active);
+  color: var(--text-primary);
+}
+
+/* ── Light theme tweaks ── */
+[data-theme="light"] .dash-grid-item {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .dash-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .dash-project-type-item {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .dash-project-kf-item {
+  background: rgba(0, 0, 0, 0.02);
+}

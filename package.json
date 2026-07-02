@@ -1,0 +1,56 @@
+{
+  "name": "universal-cli-web",
+  "version": "0.2.0",
+  "description": "Universal CLI Bridge — run any CLI in browser with full native capabilities",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build": "npx esbuild public/main.js --bundle --outfile=public/bundle.js --format=iife --minify",
+    "build:dev": "npx esbuild public/main.js --bundle --outfile=public/bundle.js --format=iife --sourcemap",
+    "watch": "npx esbuild public/main.js --bundle --outfile=public/bundle.js --format=iife --sourcemap --watch",
+    "test": "node --test"
+  },
+  "license": "MIT",
+  "author": "q-CLI Hub Contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qiuqiukof-oss/universal-cli-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qiuqiukof-oss/universal-cli-web/issues"
+  },
+  "homepage": "https://github.com/qiuqiukof-oss/universal-cli-web#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "cli",
+    "terminal",
+    "browser-terminal",
+    "web-terminal",
+    "xterm",
+    "pty",
+    "node-pty",
+    "xterm.js",
+    "devtools",
+    "ai-agent",
+    "opencode"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-search": "^0.16.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/addon-webgl": "^0.19.0",
+    "@xterm/xterm": "^6.0.0",
+    "express": "^4.21.0",
+    "multer": "^2.2.0",
+    "node-pty": "^1.1.0",
+    "uuid": "^14.0.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

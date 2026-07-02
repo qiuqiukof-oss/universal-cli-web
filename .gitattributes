@@ -1,0 +1,22 @@
+# Auto-detect text files and normalize to LF
+* text=auto eol=lf
+
+# Binary files
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff2 binary
+
+# SVG should be treated as text (diffable)
+*.svg text
+
+# Archives
+*.zip binary
+*.tar.gz binary
+*.gz binary
+
+# Documents
+*.pdf binary

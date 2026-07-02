@@ -1,0 +1,599 @@
+/* ============================================================
+   Right Panel — Dashboard/Charts/Media Sidebar
+   ============================================================ */
+
+/* ── CSS Variable ── */
+:root {
+  --right-panel-width: 480px;
+}
+
+/* ── Right Panel Container ── */
+#right-panel {
+  width: var(--right-panel-width);
+  min-width: var(--right-panel-width);
+  background: var(--bg-elevated);
+  border-left: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  z-index: 10;
+  position: relative;
+  transition: width 0.3s var(--ease-in-out), min-width 0.3s var(--ease-in-out);
+  overflow-x: hidden;
+  flex-shrink: 0;
+}
+
+/* Collapsed state */
+#right-panel.collapsed {
+  width: 44px;
+  min-width: 44px;
+  overflow: hidden;
+}
+
+/* When dragging, remove CSS transitions for real-time feedback */
+#right-panel.dragging {
+  transition: none !important;
+}
+#right-panel.dragging * {
+  transition: none !important;
+}
+
+#right-panel.collapsed .right-panel-header,
+#right-panel.collapsed .right-panel-content,
+#right-panel.collapsed .right-panel-tabs .right-tab span {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#right-panel.collapsed .right-panel-header {
+  justify-content: center;
+  padding: var(--space-3) 0;
+}
+
+/* Narrow hover-out indicator on collapsed edge */
+#right-panel.collapsed::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+#right-panel.collapsed:hover::after {
+  background: var(--accent);
+}
+
+/* ── Hidden state (fully hidden) ── */
+#right-panel.hidden {
+  display: none;
+}
+
+/* ── Resize Handle (left edge) ── */
+#right-panel-resize-handle {
+  position: absolute;
+  top: 0;
+  left: -3px;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 25;
+  background: transparent;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+#right-panel-resize-handle:hover,
+#right-panel-resize-handle.active {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+#right-panel-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 24px;
+  border-radius: 1px;
+  background: var(--border-default);
+  transition: background 0.15s, height 0.15s;
+}
+
+#right-panel-resize-handle:hover::after,
+#right-panel-resize-handle.active::after {
+  background: var(--accent);
+  height: 32px;
+}
+
+#right-panel.collapsed #right-panel-resize-handle {
+  display: none;
+}
+
+/* ── Header ── */
+.right-panel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-3);
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.right-panel-header-icon {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.right-panel-title {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.right-panel-toggle-btn {
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 9px;
+  padding: 3px 5px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.2s var(--ease-out);
+  flex-shrink: 0;
+}
+
+.right-panel-toggle-btn:hover {
+  color: var(--accent-hover);
+  background: var(--bg-hover);
+  border-color: var(--accent);
+}
+
+/* Toggle button icon flipped when collapsed (points left) */
+#right-panel.collapsed .right-panel-toggle-btn {
+  transform: rotate(180deg);
+  border-color: transparent;
+}
+
+#right-panel.collapsed .right-panel-toggle-btn:hover {
+  border-color: var(--accent);
+}
+
+/* ── Tab Bar ── */
+.right-panel-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+#right-panel.collapsed .right-panel-tabs {
+  padding: var(--space-2) 0;
+}
+
+.right-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  padding: 5px var(--space-3);
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  text-align: left;
+  font-family: var(--font-ui);
+  position: relative;
+}
+
+#right-panel.collapsed .right-tab {
+  justify-content: center;
+  padding: 6px 0;
+  border-left: none;
+}
+
+.right-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.right-tab.active {
+  background: var(--accent-glow);
+  color: var(--accent-hover);
+  border-left-color: var(--accent);
+}
+
+#right-panel.collapsed .right-tab.active {
+  border-left: none;
+}
+
+/* Active tab accent bar on left (for collapsed state) */
+.right-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.3);
+}
+
+#right-panel.collapsed .right-tab.active::after {
+  left: auto;
+  right: 0;
+  width: 2px;
+}
+
+.right-tab span {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#right-panel.collapsed .right-tab span {
+  display: none;
+}
+
+/* ── Content Area ── */
+.right-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Custom scrollbar */
+.right-panel-content::-webkit-scrollbar {
+  width: 4px;
+}
+.right-panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.right-panel-content::-webkit-scrollbar-thumb {
+  background: var(--bg-hover);
+  border-radius: 4px;
+}
+.right-panel-content::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-active);
+}
+
+/* ── Panel Pages ── */
+.rp-panel {
+  display: none;
+  height: 100%;
+  animation: rp-panel-in 0.25s var(--ease-out);
+}
+
+.rp-panel.active {
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes rp-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Placeholder (for future phases) ── */
+.rp-panel-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  text-align: center;
+  user-select: none;
+}
+
+.rp-placeholder-icon {
+  font-size: 48px;
+  opacity: 0.4;
+  margin-bottom: var(--space-2);
+  animation: rp-float 4s var(--ease-in-out) infinite;
+}
+
+@keyframes rp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.rp-placeholder-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.rp-placeholder-desc {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  max-width: 220px;
+}
+
+.rp-placeholder-badge {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--accent-glow);
+  color: var(--accent-hover);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  font-weight: 500;
+  margin-top: var(--space-1);
+}
+
+/* ============================================================
+   Light theme adjustments
+   ============================================================ */
+[data-theme="light"] #right-panel {
+  background: var(--bg-elevated);
+}
+
+[data-theme="light"] .right-tab.active {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 800px) {
+  #right-panel {
+    width: 280px;
+    min-width: 280px;
+  }
+
+  #right-panel.collapsed {
+    width: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 500px) {
+  #right-panel {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Browser Preview Tab
+   ============================================================ */
+
+/* Toolbar: address bar + nav buttons */
+.rp-browser-toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-default, #e0e0e0);
+  flex-shrink: 0;
+}
+
+.rp-browser-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.rp-browser-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 2px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  transition: background 0.12s, color 0.12s;
+}
+
+.rp-browser-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rp-browser-btn:hover:not(:disabled) {
+  background: var(--bg-hover, #f0f0f0);
+  color: var(--text-primary, #333);
+}
+
+.rp-browser-url-bar {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.rp-browser-url-bar input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--border-default, #ccc);
+  border-radius: 4px;
+  font-size: 13px;
+  background: var(--bg-default, #fff);
+  color: var(--text-primary, #333);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.rp-browser-url-bar input:focus {
+  border-color: var(--accent, #4f46e5);
+}
+
+.rp-browser-go {
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  background: var(--accent, #4f46e5);
+  color: #fff;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.rp-browser-go:hover {
+  background: var(--accent-hover, #4338ca);
+}
+
+/* iframe area: fills remaining space */
+.rp-browser-viewport {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.rp-browser-viewport iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* Status bar */
+.rp-browser-status {
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--text-tertiary, #888);
+  border-top: 1px solid var(--border-default, #e0e0e0);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ── Browser standalone button ── */
+.rp-browser-standalone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--text-secondary, #9399b2);
+  background: var(--bg-hover, #313244);
+  transition: background 0.12s, color 0.12s;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.rp-browser-standalone:hover {
+  color: var(--accent, #4f46e5);
+  background: var(--bg-active, #45475a);
+}
+
+/* ── Browser AI toggle button in status bar ── */
+.rp-browser-ai-toggle {
+  background: none;
+  border: 1px solid var(--border-default, #313244);
+  padding: 0 6px;
+  height: 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-secondary, #9399b2);
+  transition: background 0.12s, color 0.12s;
+}
+.rp-browser-ai-toggle:hover {
+  background: var(--bg-hover, #313244);
+  color: var(--accent, #4f46e5);
+}
+
+/* ── Browser AI panel ── */
+.browser-ai-panel {
+  border-top: 1px solid var(--border-default, #313244);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+.browser-ai-panel.hidden { display: none; }
+.browser-ai-header {
+  padding: 6px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary, #9399b2);
+  display: flex;
+  justify-content: space-between;
+  background: var(--bg-surface, #1e1e2e);
+  border-bottom: 1px solid var(--border-default, #313244);
+}
+.browser-ai-context {
+  font-weight: 400;
+  font-size: 9px;
+  color: var(--text-tertiary, #6c7086);
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.browser-ai-response {
+  padding: 8px;
+  font-size: 11px;
+  color: var(--text-primary, #cdd6f4);
+  min-height: 40px;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.5;
+  background: var(--bg-elevated, #181825);
+}
+.browser-ai-input-row {
+  display: flex;
+  border-top: 1px solid var(--border-default, #313244);
+}
+.browser-ai-input-row input {
+  flex: 1;
+  border: none;
+  padding: 6px 8px;
+  font-size: 11px;
+  outline: none;
+  background: var(--bg-surface, #1e1e2e);
+  color: var(--text-primary, #cdd6f4);
+}
+.browser-ai-input-row button {
+  border: none;
+  background: var(--accent, #4f46e5);
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.browser-ai-input-row button:hover {
+  background: var(--accent-hover, #4338ca);
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] .rp-browser-url-bar input {
+  background: var(--bg-elevated, #1e1e2e);
+  color: var(--text-primary, #cdd6f4);
+  border-color: var(--border-default, #313244);
+}
+
+[data-theme="dark"] .rp-browser-viewport iframe {
+  background: #1e1e2e;
+}

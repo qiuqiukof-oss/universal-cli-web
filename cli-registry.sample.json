@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "clis": [
+    {
+      "id": "opencode",
+      "name": "opencode",
+      "path": "/usr/local/bin/opencode",
+      "type": "interactive",
+      "category": "agent",
+      "discovered": "builtin",
+      "args": [],
+      "version": "auto",
+      "addedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "node",
+      "name": "node",
+      "path": "/usr/local/bin/node",
+      "type": "batch",
+      "category": "directory",
+      "discovered": "path",
+      "args": [],
+      "version": "v22.0.0",
+      "addedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "git",
+      "name": "git",
+      "path": "/usr/bin/git",
+      "type": "batch",
+      "category": "tool",
+      "discovered": "path",
+      "args": [],
+      "version": "git version 2.40.0",
+      "addedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "folders": []
+}

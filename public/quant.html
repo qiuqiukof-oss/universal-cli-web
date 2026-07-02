@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>量化交易 — Q-CLI</title>
+  <link rel="stylesheet" href="/css/theme.css" />
+  <link rel="stylesheet" href="/css/quant-trading.css" />
+  <style>
+    /* ── Standalone full-page layout ── */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: var(--bg-surface, #11111b);
+      color: var(--text-primary, #cdd6f4);
+      font-family: var(--font-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top nav bar ── */
+    .quant-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: var(--bg-elevated, #1e1e2e);
+      border-bottom: 1px solid var(--border-default, #313244);
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .quant-nav-back {
+      color: var(--accent, #4f46e5);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      transition: background 0.12s;
+      cursor: pointer;
+    }
+    .quant-nav-back:hover {
+      background: var(--bg-hover, #313244);
+    }
+    .quant-nav-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .quant-nav-subtitle {
+      font-size: 12px;
+      color: var(--text-tertiary, #6c7086);
+    }
+    .quant-nav-spacer {
+      flex: 1;
+    }
+    .quant-nav-status {
+      font-size: 11px;
+      color: var(--text-tertiary, #6c7086);
+      padding: 2px 8px;
+      border: 1px solid var(--border-default, #313244);
+      border-radius: 4px;
+    }
+
+    /* ── Quant panel container (full page) ── */
+    #rp-quant {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Override the 320px panel constraint — use full width */
+    #rp-quant .quant-content {
+      max-width: none;
+      padding: var(--space-3, 16px);
+    }
+
+    /* Widen fixed-width elements for standalone */
+    #rp-quant .quant-chart-wrap {
+      min-height: 420px;
+    }
+
+    /* ── Full-height right panel content ── */
+    .rp-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <!-- Top Nav -->
+  <nav class="quant-nav">
+    <a class="quant-nav-back" href="/" onclick="event.preventDefault(); if(window.QCLI?.QuantTrading) QCLI.QuantTrading._isRunning = false; location.href='/';">&larr; 返回主应用</a>
+    <span class="quant-nav-title">🤖 量化交易</span>
+    <span class="quant-nav-subtitle">独立页面</span>
+    <span class="quant-nav-spacer"></span>
+    <span class="quant-nav-status" id="quant-nav-status">后端: 检测中...</span>
+  </nav>
+
+  <!-- Quant Panel — same id as in main app, auto-initialized by quant-trading.js -->
+  <div class="rp-panel active" id="rp-quant">
+    <div class="dash-empty" style="padding:40px;text-align:center;color:var(--text-tertiary);">
+      <div style="font-size:32px;margin-bottom:12px;">🤖</div>
+      加载中...
+    </div>
+  </div>
+
+  <!-- Bundle — includes quant-trading.js -->
+  <script src="/bundle.js"></script>
+  <script>
+    // Small delay to let bundle.js init run, then force-render if needed
+    setTimeout(() => {
+      const panel = document.getElementById('rp-quant');
+      if (panel && panel.querySelector('.dash-empty')) {
+        // init() may have missed the active class; force render
+        if (window.QCLI?.QuantTrading?.render) {
+          window.QCLI.QuantTrading.render();
+        }
+      }
+      // Check backend status
+      fetch('/api/quant/market-data?symbol=BTC/USDT&tf=1h')
+        .then(r => r.ok ? '在线' : '离线')
+        .catch(() => '离线')
+        .then(status => {
+          const el = document.getElementById('quant-nav-status');
+          if (el) el.textContent = '后端: ' + status;
+        });
+    }, 300);
+  </script>
+</body>
+</html>

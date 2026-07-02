@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="app.title">Q-CLI 集成器 — Universal CLI Bridge</title>
+  <link rel="stylesheet" href="/xterm/css/xterm.css" />
+  <link rel="stylesheet" href="/css/theme.css" />
+  <link rel="stylesheet" href="/css/sidebar.css" />
+  <link rel="stylesheet" href="/css/terminal.css" />
+  <link rel="stylesheet" href="/css/welcome.css" />
+  <link rel="stylesheet" href="/css/chat.css" />
+  <link rel="stylesheet" href="/css/toast.css" />
+  <link rel="stylesheet" href="/css/modal.css" />
+  <link rel="stylesheet" href="/css/panels.css" />
+  <link rel="stylesheet" href="/css/right-panel.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/charts.css" />
+  <link rel="stylesheet" href="/css/stocks.css" />
+  <link rel="stylesheet" href="/css/media.css" />
+<link rel="stylesheet" href="/css/quant-trading.css" />
+</head>
+<body>
+  <!-- ====== Global Loading Progress Bar ====== -->
+  <div id="global-progress"></div>
+  <!-- ====== Sidebar ====== -->
+  <aside id="sidebar">
+    <header class="sidebar-header">
+      <h1>⚡ Q-CLI</h1>
+      <div class="preset-selector" id="preset-selector">
+        <button class="preset-toggle" id="preset-toggle" title="切换预设"><span class="preset-toggle-icon">💻</span><span class="preset-toggle-label" id="preset-toggle-label">开发者</span></button>
+        <div class="preset-dropdown hidden" id="preset-dropdown">
+          <div class="preset-dropdown-header">CLI 预设</div>
+          <div id="preset-list"></div>
+        </div>
+      </div>
+      <button id="discover-btn" class="icon-btn" title="Re-discover CLIs from PATH">⟳</button>
+    </header>
+
+    <div id="search-area">
+      <input type="text" id="search-input" placeholder="🔍  Search CLIs..." autocomplete="off" />
+      <button id="add-folder-btn" class="icon-btn" title="New folder">📁+</button>
+    </div>
+
+    <!-- Category filter chips -->
+    <div id="category-filters">
+      <button class="category-chip active" data-category="all">All</button>
+      <button class="category-chip" data-category="favorites">⭐ Favorites (0)</button>
+      <button class="category-chip" data-category="agent">🤖 Agent</button>
+      <button class="category-chip" data-category="directory">📂 Env</button>
+      <button class="category-chip" data-category="tool">🔧 Tool</button>
+    </div>
+
+    <!-- Workflow section -->
+    <div id="workflow-section">
+      <div class="agent-header">
+        <span class="agent-header-icon">⚡</span>
+        <span class="agent-header-title">Workflows</span>
+      </div>
+      <div id="workflow-list">
+        <div class="agent-loading">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Agent section -->
+    <div id="agent-section">
+      <div class="agent-header">
+        <span class="agent-header-icon">🤖</span>
+        <span class="agent-header-title">AI Agents</span>
+        <button id="agent-refresh-btn" class="icon-btn" title="Refresh agents">⟳</button>
+      </div>
+      <div id="agent-list">
+        <div class="agent-loading">Scanning...</div>
+      </div>
+    </div>
+
+    <nav id="cli-list" role="listbox" aria-label="Available CLIs">
+      <!-- Skeleton loading placeholders — replaced by app.js when data loads -->
+      <div class="skeleton-list">
+        <div class="skeleton-item"><div class="skeleton-shape s-icon"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1"></div><div class="skeleton-shape s-line s-line-2"></div></div><div class="skeleton-shape s-badge"></div></div>
+        <div class="skeleton-item"><div class="skeleton-shape s-icon"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1 s-line-w"></div><div class="skeleton-shape s-line s-line-2 s-line-w2"></div></div><div class="skeleton-shape s-badge"></div></div>
+        <div class="skeleton-item"><div class="skeleton-shape s-icon"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1"></div><div class="skeleton-shape s-line s-line-2"></div></div><div class="skeleton-shape s-badge s-badge-sm"></div></div>
+        <div class="skeleton-item"><div class="skeleton-shape s-icon"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1"></div><div class="skeleton-shape s-line s-line-2"></div></div><div class="skeleton-shape s-badge"></div></div>
+        <div class="skeleton-item"><div class="skeleton-shape s-icon"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1 s-line-w"></div><div class="skeleton-shape s-line s-line-2"></div></div><div class="skeleton-shape s-badge s-badge-sm"></div></div>
+        <div class="skeleton-item"><div class="skeleton-shape s-icon"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1"></div><div class="skeleton-shape s-line s-line-2 s-line-w2"></div></div><div class="skeleton-shape s-badge"></div></div>
+      </div>
+      <div class="skeleton-list skeleton-list-folder">
+        <div class="skeleton-item s-folder"><div class="skeleton-shape s-folder-toggle"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-folder-line"></div></div></div>
+        <div class="skeleton-item"><div class="skeleton-shape s-icon s-icon-nest"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1"></div><div class="skeleton-shape s-line s-line-2"></div></div><div class="skeleton-shape s-badge"></div></div>
+        <div class="skeleton-item"><div class="skeleton-shape s-icon s-icon-nest"></div><div class="skeleton-lines"><div class="skeleton-shape s-line s-line-1 s-line-w"></div><div class="skeleton-shape s-line s-line-2"></div></div><div class="skeleton-shape s-badge s-badge-sm"></div></div>
+      </div>
+    </nav>
+
+    <!-- Pinned Output Section - Enhanced with report tools -->
+    <div id="pinned-section" class="sidebar-pinned-section hidden">
+      <div class="pinned-header">
+        <span class="pinned-header-icon">📌</span>
+        <span class="pinned-header-title">输出片段</span>
+        <div class="pinned-header-actions">
+          <button id="pinned-report-btn" class="pinned-header-btn" title="打开报告面板">📋</button>
+          <button id="pinned-clear-btn" class="pinned-clear-btn" title="清除">🗑</button>
+        </div>
+      </div>
+      <div id="pin-merge-bar" class="pin-merge-bar hidden">
+        <span id="pin-merge-count" class="pin-merge-count"></span>
+        <button class="pin-merge-action-btn" onclick="window.QCLI?.PinReport?.mergeSelectedPins()">🔗 合并</button>
+        <button class="pin-merge-action-btn" onclick="window.QCLI?.PinReport?.exportSelectedToMarkdown?.()">📥 导出选中</button>
+        <button class="pin-merge-action-btn cancel" onclick="window.QCLI?.PinReport?.toggleMergeMode?.()">✕ 取消</button>
+      </div>
+      <div id="pinned-list"></div>
+    </div>
+
+    <footer class="sidebar-footer">
+      <button id="add-cli-btn" class="primary-btn">+ Add CLI</button>
+      <div id="connection-status" class="status-indicator disconnected">
+        <span class="status-dot"></span>
+        <span class="status-text">Disconnected</span>
+      </div>
+    </footer>
+
+    <button id="sidebar-toggle" class="sidebar-toggle-btn" data-i18n-title="sidebar.toggle.collapse">◀</button>
+    <div id="sidebar-resize-handle" data-i18n-title="sidebar.resize"></div>
+  </aside>
+
+  <!-- ====== Main: Terminal ====== -->
+  <main id="main">
+    <div id="terminal-area">
+      <div id="tab-bar"></div>
+      <div id="terminal-container">
+      <div id="terminal"></div>
+      <!-- Terminal Search Bar -->
+      <div id="terminal-search-bar" class="hidden">
+        <div class="tsb-wrap">
+          <span class="tsb-icon">🔍</span>
+          <input type="text" id="terminal-search-input" placeholder="Search terminal output…" spellcheck="false" />
+          <span id="terminal-search-results" class="tsb-results">0/0</span>
+          <button class="tsb-btn" id="terminal-search-prev" title="Previous (Shift+Enter)">▲</button>
+          <button class="tsb-btn" id="terminal-search-next" title="Next (Enter)">▼</button>
+          <button class="tsb-close" id="terminal-search-close" title="Close (Esc)">✕</button>
+        </div>
+      </div>
+      <div id="connection-lost">
+        <div class="cl-body">
+          <div class="cl-icon">🔌</div>
+          <p>Connection lost — click to reconnect <span class="reconnect-spinner hidden">⟳</span></p>
+          <span class="cl-hint">Auto-reconnect will attempt 10 times with exponential backoff</span>
+        </div>
+      </div>
+
+      <!-- ====== Chat Drawer ====== -->
+      <div id="chat-drawer" class="hidden">
+        <div id="chat-resize-handle" data-i18n-title="chat.resize"></div>
+        <div class="chat-header">
+          <span class="chat-header-icon">💬</span>
+          <span class="chat-header-title" data-i18n="chat.title">AI 对话</span>
+          <span class="chat-header-subtitle" data-i18n="chat.subtitle">与 AI 助手交流</span>
+          <div class="chat-header-actions">
+            <button id="chat-clear-btn" class="chat-action-btn" data-i18n-title="chat.clear">🗑</button>
+            <button id="chat-close-btn" class="chat-action-btn" data-i18n-title="chat.close">✕</button>
+          </div>
+        </div>
+        <div id="chat-messages">
+          <div class="chat-message welcome-msg">
+            <div class="msg-avatar ai-avatar">🤖</div>
+            <div class="msg-content">
+              <div class="msg-sender" data-i18n="chat.sender.ai">AI 助手</div>
+              <div class="msg-bubble ai-bubble" data-i18n="chat.welcome">你好！我是 Q-CLI 的 AI 助手。你可以问我关于 CLI 工具的问题，或者让我帮你分析终端输出。😊</div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea id="chat-input" rows="1" data-i18n-placeholder="chat.input.placeholder" autocomplete="off"></textarea>
+          <button id="chat-send-btn" class="chat-send-btn" data-i18n-title="chat.send">➤</button>
+        </div>
+      </div>
+
+      <!-- ====== Session Restore Overlay ====== -->
+      <div id="session-restore-overlay" class="hidden">
+        <div id="session-restore-bg"></div>
+        <div id="session-restore-panel">
+          <div class="session-restore-header">
+            <span class="session-restore-icon">📂</span>
+            <span class="session-restore-title">恢复上次会话?</span>
+            <span class="session-restore-hint" id="session-restore-count"></span>
+          </div>
+          <div id="session-restore-list">
+            <!-- Populated dynamically -->
+          </div>
+          <div class="session-restore-footer">
+            <button id="session-restore-ignore" class="secondary-btn">忽略</button>
+            <button id="session-restore-all" class="primary-btn">全部恢复</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== Welcome Overlay (Default View) ====== -->
+      <div id="welcome-overlay">
+        <div class="welcome-scroll">
+          <div class="welcome-content">
+
+            <!-- Header (always visible) -->
+            <div class="welcome-header">
+              <div class="welcome-logo">⚡</div>
+              <h2 data-i18n="welcome.title">Q-CLI 集成器</h2>
+              <p class="welcome-subtitle" data-i18n="welcome.subtitle">Universal CLI Bridge — 在浏览器中运行任意 CLI</p>
+            </div>
+
+            <!-- ====== Carousel ====== -->
+            <div class="welcome-carousel" id="welcome-carousel">
+              <!-- Track -->
+              <div class="carousel-track" id="carousel-track">
+
+                <!-- Slide 0: Quick Start + Features -->
+                <div class="carousel-slide" data-slide="0">
+                  <section class="welcome-section">
+                    <h3>🚀 快速开始</h3>
+                    <div class="welcome-grid" id="welcome-grid">
+                      <!-- Populated by renderWelcome() from preset data -->
+                      <div class="welcome-card">
+                        <div class="card-icon">1</div>
+                        <div class="card-body">
+                          <strong>选择 CLI</strong>
+                          <span>点击左侧 CLIs 列表中的任意工具</span>
+                        </div>
+                      </div>
+                      <div class="welcome-card">
+                        <div class="card-icon">2</div>
+                        <div class="card-body">
+                          <strong>开始使用</strong>
+                          <span>终端自动启动，直接输入命令操作</span>
+                        </div>
+                      </div>
+                      <div class="welcome-card">
+                        <div class="card-icon">3</div>
+                        <div class="card-body">
+                          <strong>随时切换</strong>
+                          <span>点击其他 CLI 即可切换，运行状态互不干扰</span>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="welcome-section">
+                    <h3>⭐ 特色功能</h3>
+                    <div class="features-grid" id="welcome-features">
+                      <!-- Populated by renderWelcome() from preset data -->
+                    </div>
+                  </section>
+                </div>
+
+                <!-- Slide 1: Keyboard Shortcuts + Tips -->
+                <div class="carousel-slide" data-slide="1">
+                  <section class="welcome-section">
+                    <h3>⌨️ 快捷键</h3>
+                    <div class="shortcuts-grid" id="welcome-shortcuts">
+                      <!-- Populated by renderWelcome() from preset data -->
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+K</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">打开命令面板</span></div>
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+B</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">切换侧边栏</span></div>
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+Shift+F</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">终端内搜索</span></div>
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+L</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">清屏</span></div>
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+I</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">AI 对话</span></div>
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+= / Ctrl+-</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">调整字体大小</span></div>
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+Shift+C</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">复制选中文本</span></div>
+                      <div class="shortcut-row"><span class="shortcut-key">Ctrl+Shift+V</span><span class="shortcut-arrow">→</span><span class="shortcut-desc">粘贴</span></div>
+                    </div>
+                  </section>
+
+                  <section class="welcome-section">
+                    <h3>💡 使用技巧</h3>
+                    <ul class="tips-list" id="welcome-tips">
+                      <!-- Populated by renderWelcome() from preset data -->
+                      <li>使用 <strong>搜索框</strong> 快速过滤 CLI 列表</li>
+                      <li>创建 <strong>文件夹</strong> 分组管理你的 CLI 工具</li>
+                      <li>拖拽文件到终端区域可快速 <strong>上传文件</strong></li>
+                      <li>点击 <strong>⟳</strong> 按钮从 PATH 自动发现新 CLI</li>
+                    </ul>
+                  </section>
+                </div>
+
+                <!-- Slide 2: Installation Guides -->
+                <div class="carousel-slide" data-slide="2">
+                  <section class="welcome-section">
+                    <h3>📦 安装指南</h3>
+                    <div class="install-grid" id="welcome-install">
+                      <!-- Populated by renderWelcome() from preset data -->
+                    </div>
+                  </section>
+                </div>
+
+
+
+              </div><!-- /carousel-track -->
+
+              <!-- Navigation arrows -->
+              <button class="carousel-arrow carousel-arrow-prev" id="carousel-prev" data-i18n-title="carousel.prev">◀</button>
+              <button class="carousel-arrow carousel-arrow-next" id="carousel-next" data-i18n-title="carousel.next">▶</button>
+
+              <!-- Dots -->
+              <div class="carousel-dots" id="carousel-dots">
+                <button class="carousel-dot active" data-slide="0" title="快速开始 + CLI 分类"></button>
+                <button class="carousel-dot" data-slide="1" title="快捷键 + 使用技巧"></button>
+                <button class="carousel-dot" data-slide="2" title="安装指南"></button>
+              </div>
+            </div><!-- /welcome-carousel -->
+
+            <!-- Footer (always visible) -->
+            <div class="welcome-footer">
+              <span data-i18n="footer.title">Q-CLI 集成器 v0.1.0</span>
+              <span class="footer-sep">·</span>
+              <span>Node.js + xterm.js + node-pty</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div><!-- /terminal-container -->
+    </div><!-- /terminal-area -->
+
+    <div id="status-bar">
+      <span id="active-cli-label">No CLI running</span>
+      <span id="active-cli-version"></span>
+      <button id="voice-input-btn" class="voice-btn" data-i18n-title="voice.title">🎤</button>
+      <div id="voice-status" class="voice-status hidden">
+        <span class="voice-indicator"></span>
+        <span class="voice-text">Listening...</span>
+      </div>
+      <button id="lang-toggle-btn" class="lang-toggle" title="切换语言">中</button>
+      <button id="theme-toggle-btn" class="theme-toggle" data-i18n-title="theme.toggle">🌙</button>
+      <button id="custom-css-btn" class="theme-toggle" title="Custom CSS" style="font-size:12px;">🎨</button>
+      <span id="terminal-dims" class="hidden"></span>
+      <span id="terminal-font-size" class="hidden"></span>
+      <button id="ai-settings-btn" class="ai-settings-btn" title="AI 设置">🤖</button>
+      <button id="chat-toggle-btn" class="chat-toggle-btn" title="AI 对话面板">💬</button>
+    </div>
+  </main>
+
+  <!-- ====== Right Panel ====== -->
+  <aside id="right-panel">
+    <header class="right-panel-header">
+      <span class="right-panel-header-icon">📊</span>
+      <span class="right-panel-title">工作台</span>
+      <button id="right-panel-toggle" class="right-panel-toggle-btn" title="收起右侧栏">▶</button>
+    </header>
+
+    <nav class="right-panel-tabs" id="right-panel-tabs">
+      <button class="right-tab active" data-panel="dashboard" title="仪表盘">📊<span>仪表盘</span></button>
+      <button class="right-tab" data-panel="stocks" title="股票分析">📈<span>股票分析</span></button>
+      <button class="right-tab" data-panel="media" title="多媒体">🎬<span>多媒体</span></button>
+      <button class="right-tab" data-panel="browser" title="浏览器预览">🌐<span>浏览器</span></button>
+      <button class="right-tab" data-panel="quant" title="量化交易">🤖<span>量化交易</span></button>
+    </nav>
+
+    <div class="right-panel-content" id="right-panel-content">
+      <!-- Dashboard Panel (Phase 2) -->
+      <div class="rp-panel active" id="rp-dashboard">
+        <div class="rp-panel-placeholder">
+          <div class="rp-placeholder-icon">📊</div>
+          <div class="rp-placeholder-title">系统仪表盘</div>
+          <div class="rp-placeholder-desc">连接状态 · CLI 统计 · 运行概览</div>
+          <div class="rp-placeholder-badge">Phase 2</div>
+        </div>
+      </div>
+
+      <!-- Stocks Panel (Phase 3) -->
+      <div class="rp-panel" id="rp-stocks">
+        <!-- Dynamically rendered by stock-analysis.js -->
+      </div>
+
+      <!-- Media Panel (Phase 4) -->
+      <div class="rp-panel" id="rp-media">
+        <!-- Dynamically rendered by multi-media.js -->
+      </div>
+
+      <!-- Browser Preview Panel -->
+      <div class="rp-panel" id="rp-browser">
+          <div class="rp-browser-toolbar">
+          <div class="rp-browser-nav">
+            <button id="browser-back" class="rp-browser-btn" disabled>◀</button>
+            <button id="browser-forward" class="rp-browser-btn" disabled>▶</button>
+            <button id="browser-refresh" class="rp-browser-btn">⟳</button>
+            <button id="browser-close" class="rp-browser-btn" title="关闭页面">✕</button>
+          </div>
+          <div class="rp-browser-url-bar">
+            <input id="browser-url-input" type="text" placeholder="输入 URL，例如 https://example.com" />
+            <button id="browser-go-btn" class="rp-browser-go">前往</button>
+          </div>
+          <a href="/browser" class="rp-browser-standalone" title="新窗口打开独立页面" target="_blank">↗</a>
+        </div>
+        <div class="rp-browser-viewport">
+          <iframe id="browser-iframe"
+            src="about:blank"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            loading="lazy">
+          </iframe>
+        </div>
+        <div class="rp-browser-status">
+          <span id="browser-status-text">就绪</span>
+          <div style="flex:1"></div>
+          <button id="browser-ai-toggle" class="rp-browser-ai-toggle" title="AI 分析">🤖 AI</button>
+        </div>
+        <!-- Browser AI Panel -->
+        <div class="browser-ai-panel hidden" id="browser-ai-panel">
+          <div class="browser-ai-header">
+            <span>AI 分析</span>
+            <span class="browser-ai-context" id="browser-ai-context">当前页面：无</span>
+          </div>
+          <div class="browser-ai-response" id="browser-ai-response">
+            输入问题，AI 将基于当前页面 URL 进行分析。
+          </div>
+          <div class="browser-ai-input-row">
+            <input type="text" id="browser-ai-input" placeholder="例如：这个网站是做什么的？" />
+            <button id="browser-ai-send">发送</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quant Trading Panel -->
+      <div class="rp-panel" id="rp-quant">
+        <!-- Dynamically rendered by quant-trading.js -->
+      </div>
+    </div>
+
+    <div id="right-panel-resize-handle" title="拖拽调整宽度"></div>
+  </aside>
+
+  <!-- ====== Add CLI Modal ====== -->
+  <div id="add-cli-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>Add CLI</h2>
+      <form id="add-cli-form">
+        <div class="form-row file-row">
+          <div class="form-group" style="flex:1">
+            <label for="add-cli-name">Name</label>
+            <input type="text" id="add-cli-name" placeholder="e.g. python, node, gh" required autofocus />
+          </div>
+          <div class="form-group browse-group">
+            <label>Executable</label>
+            <div class="browse-input">
+              <button type="button" id="browse-cli-btn" class="secondary-btn">Browse…</button>
+              <input type="file" id="file-input" accept=".exe,.cmd,.bat,.com,.ps1" hidden />
+              <span id="selected-file" class="file-label hidden">No file selected</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="manual-path-group" class="hidden">
+          <label for="add-cli-path">
+            Full path <small>(or leave blank to auto-resolve from name)</small>
+          </label>
+          <input type="text" id="add-cli-path" placeholder="e.g. C:\tools\my-cli.exe" />
+        </div>
+
+        <label>
+          Arguments <small>(optional, space-separated)</small>
+          <input type="text" id="add-cli-args" placeholder="--interactive --no-color" />
+        </label>
+
+        <label>
+          Init command <small>(optional — auto-run after launch)</small>
+          <input type="text" id="add-cli-init" placeholder="e.g. cd /project && npm start" />
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" id="add-cli-cancel" class="secondary-btn">Cancel</button>
+          <button type="submit" id="add-cli-submit" class="primary-btn">Add</button>
+        </div>
+      </form>
+      <p id="add-cli-error" class="form-error hidden"></p>
+    </div>
+  </div>
+
+  <!-- ====== Mobile sidebar overlay ====== -->
+  <div id="sidebar-mobile-overlay"></div>
+
+  <!-- ====== Media Preview Overlay ====== -->
+  <div id="media-preview" class="hidden">
+    <div id="media-preview-bg"></div>
+    <div class="media-preview-header">
+      <span id="media-preview-name"></span>
+      <div class="media-preview-actions">
+        <span id="media-preview-counter" class="media-counter"></span>
+        <button id="media-prev-btn" class="media-nav-btn" data-i18n-title="media.prev">◀</button>
+        <button id="media-next-btn" class="media-nav-btn" data-i18n-title="media.next">▶</button>
+        <button id="media-download-btn" class="media-nav-btn" data-i18n-title="media.download">⬇</button>
+        <button id="media-close-btn" class="media-nav-btn close-btn" data-i18n-title="media.close">✕</button>
+      </div>
+    </div>
+    <div id="media-preview-body">
+      <div id="media-preview-content"></div>
+    </div>
+    <div class="media-preview-footer">
+      <span id="media-preview-meta"></span>
+    </div>
+  </div>
+
+  <!-- ====== Drop zone overlay ====== -->
+  <div id="drop-overlay" class="hidden">
+    <div class="drop-content">
+      <span class="drop-icon">⬇</span>
+      <p data-i18n="upload.drop">Drop files to upload</p>
+    </div>
+  </div>
+
+  <!-- ====== Command Palette (Cmd+K) ====== -->
+  <div id="cp-overlay" class="hidden">
+    <div id="command-palette">
+      <div class="cp-header">
+        <input type="text" id="cp-input" data-i18n-placeholder="palette.shortcutHint" autocomplete="off" spellcheck="false" />
+        <kbd class="cp-shortcut-hint">Ctrl+K</kbd>
+      </div>
+      <div id="cp-results">
+        <div class="cp-empty">Type to search…</div>
+      </div>
+      <div class="cp-footer">
+        <span>↑↓ navigate &middot; ↵ select &middot; Esc close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== AI Settings Modal ====== -->
+  <div id="ai-settings-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>🤖 AI 设置</h2>
+      <form id="ai-settings-form">
+        <label>
+          提供商
+          <select id="ai-provider" class="modal-select">
+            <option value="openai">OpenAI 兼容</option>
+            <option value="anthropic">Anthropic</option>
+          </select>
+        </label>
+
+        <label>
+          API Base URL（可选，兼容 OpenAI 格式）
+          <input type="url" id="ai-base-url" placeholder="https://api.openai.com/v1" />
+          <small>留空使用默认端点。可填入 Ollama: http://localhost:11434/v1，或其他兼容 OpenAI 的代理地址</small>
+        </label>
+
+        <label>
+          API Key
+          <input type="password" id="ai-api-key" placeholder="sk-... 或粘贴你的 API Key" />
+          <small>API Key 仅存储在浏览器本地，不会上传到其他服务器</small>
+        </label>
+
+        <label>
+          模型（可选，留空自动选择）
+          <input type="text" id="ai-model" placeholder="gpt-4o-mini / claude-3-haiku-20240307" />
+          <small>也可通过环境变量 OPENAI_API_KEY / ANTHROPIC_API_KEY 配置</small>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" id="ai-settings-cancel" class="secondary-btn">取消</button>
+          <button type="submit" id="ai-settings-save" class="primary-btn">保存</button>
+        </div>
+      </form>
+      <p id="ai-settings-status" class="ai-status hidden"></p>
+    </div>
+  </div>
+
+  <!-- ====== Scripts ====== -->
+  <script src="/xterm/lib/xterm.js"></script>
+  <script src="/xterm-addon-fit/lib/addon-fit.js"></script>
+<script src="/xterm-addon-web-links/lib/addon-web-links.js"></script>
+<script src="/xterm-addon-webgl/lib/addon-webgl.js"></script>
+<script src="/xterm-addon-search/lib/addon-search.js"></script>
+  <script src="/bundle.js"></script>
+
+
+
+  <!-- ====== Global Command History Panel (Ctrl+Shift+H) ====== -->
+  <div id="history-panel" class="hidden">
+    <div id="history-panel-bg"></div>
+    <div id="history-panel-inner">
+      <div class="history-panel-header">
+        <span class="history-panel-icon">📜</span>
+        <span class="history-panel-title">全局命令历史</span>
+        <input type="text" id="history-search-input" placeholder="🔍 搜索历史命令..." autocomplete="off" />
+        <span class="history-panel-count" id="history-count"></span>
+        <button id="history-clear-btn" class="history-clear-btn" title="清除所有历史">🗑</button>
+        <button id="history-close-btn" class="history-close-btn" title="关闭 (Esc)">✕</button>
+      </div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- ====== Global Search Panel (Ctrl+Shift+A) ====== -->
+  <div id="global-search-panel" class="hidden">
+    <div id="global-search-bg"></div>
+    <div id="global-search-inner">
+      <div class="global-search-header">
+        <span class="global-search-icon">🔍</span>
+        <span class="global-search-title">全局搜索</span>
+        <input type="text" id="global-search-input" placeholder="跨所有终端搜索..." autocomplete="off" spellcheck="false" />
+        <span class="global-search-count" id="global-search-count"></span>
+        <button id="global-search-close-btn" class="history-close-btn" title="关闭 (Esc)">✕</button>
+      </div>
+      <div id="global-search-status" class="global-search-status"></div>
+      <div id="global-search-results"></div>
+    </div>
+  </div>
+
+  <!-- ====== Snippet Manager Overlay ====== -->
+  <div id="snippet-overlay" class="hidden">
+    <div id="snippet-overlay-bg"></div>
+    <div id="snippet-panel">
+      <div class="snippet-panel-header">
+        <span class="snippet-panel-icon">📋</span>
+        <span class="snippet-panel-title">代码片段库</span>
+        <button id="snippet-add-btn" class="snippet-add-btn">+ 新增</button>
+        <button id="snippet-close-btn" class="history-close-btn" title="关闭 (Esc)">✕</button>
+      </div>
+      <div id="snippet-list"></div>
+    </div>
+  </div>
+
+  <!-- ====== Add Snippet Modal ====== -->
+  <div id="add-snippet-modal" class="modal-overlay hidden">
+    <div class="modal" style="width:500px;">
+      <h2>📋 添加代码片段</h2>
+      <form id="add-snippet-form">
+        <label>
+          名称
+          <input type="text" id="snippet-name" placeholder="e.g. git push" required autofocus />
+        </label>
+        <label>
+          命令
+          <input type="text" id="snippet-command" placeholder="e.g. git add -A && git commit -m \"{{message}}\" && git push" required />
+        </label>
+        <label>
+          描述（可选）
+          <input type="text" id="snippet-desc" placeholder="一键推送代码到远程仓库" />
+        </label>
+        <div class="modal-actions">
+          <button type="button" id="add-snippet-cancel" class="secondary-btn">取消</button>
+          <button type="submit" id="add-snippet-submit" class="primary-btn">保存</button>
+        </div>
+      </form>
+      <p id="add-snippet-error" class="form-error hidden"></p>
+    </div>
+  </div>
+
+  <!-- ====== Workspace Profiles Overlay ====== -->
+  <div id="workspace-overlay" class="hidden">
+    <div id="workspace-overlay-bg"></div>
+    <div id="workspace-panel">
+      <div class="workspace-panel-header">
+        <span class="workspace-panel-icon">📂</span>
+        <span class="workspace-panel-title">工作区 Profiles</span>
+        <button id="workspace-save-btn" class="snippet-add-btn">💾 保存当前</button>
+        <button id="workspace-close-btn" class="history-close-btn" title="关闭 (Esc)">✕</button>
+      </div>
+      <div id="workspace-list"></div>
+    </div>
+  </div>
+
+  <!-- ====== Pin Report Panel Overlay ====== -->
+  <div id="pin-report-overlay" class="hidden">
+    <div id="pin-report-bg"></div>
+    <div id="pin-report-panel">
+      <div class="pin-report-header">
+        <span class="pin-report-header-icon">📋</span>
+        <span class="pin-report-header-title">报告面板</span>
+        <span id="pin-report-count" class="pin-report-count"></span>
+        <button id="pin-report-export-btn" class="pin-report-header-btn" title="导出全部为 Markdown">📥 导出全部</button>
+        <button id="pin-report-close" class="pin-report-header-btn close" title="关闭">✕</button>
+      </div>
+      <div id="pin-report-list"></div>
+    </div>
+  </div>
+
+  <!-- ====== Terminal Context Menu ====== -->
+  <div id="terminal-context-menu" class="hidden">
+    <div class="ctx-item ctx-copy" id="ctx-copy">📋 Copy</div>
+    <div class="ctx-item ctx-pin" id="ctx-pin">📌 Pin to sidebar</div>
+    <div class="ctx-item ctx-search-sel" id="ctx-search-sel">🔍 Search selection</div>
+    <div class="ctx-divider ctx-divider-sel"></div>
+    <div class="ctx-item ctx-paste" id="ctx-paste">📄 Paste</div>
+    <div class="ctx-item ctx-clear" id="ctx-clear">🧹 Clear screen</div>
+    <div class="ctx-item ctx-search" id="ctx-search">🔍 Search… (<kbd>Ctrl+Shift+F</kbd>)</div>
+  </div>
+
+
+</body>
+</html>

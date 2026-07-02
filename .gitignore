@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+
+# CLI registry (auto-generated, contains local PATH info)
+cli-registry.json
+
+# Runtime logs
+server.log
+npm-debug.log*
+*.log
+
+# Temp uploads (os.tmpdir()/universal-cli-uploads/)
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+
+# Temp / debug scripts
+_fix_*.js
+_add_*.js
+
+# Batch launchers (local convenience)
+*.bat
+启动方式.txt
+
+# Test coverage
+coverage/
+
+# OpenCode / agent tooling
+.omo/
+.opencode/
+
+# Project local development notes
+PROJECT_STATUS.md
+
+# Marketing pages (local copies only)
+q-cli-hub-readme.html
+q-cli-hub-video-16x9.html
+
+# Internal dev todo
+TODO.md
+
+# Test output files
+test-output/
+
+# Build artifacts
+public/bundle.js
+public/bundle.min.js
+public/bundle.js.map
+
+

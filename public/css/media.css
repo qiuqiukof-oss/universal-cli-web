@@ -1,0 +1,489 @@
+/* ============================================================
+   Multimedia Panel — Right Sidebar Gallery & Player
+   ============================================================ */
+
+/* ── Media Content Container ── */
+.media-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.media-content::-webkit-scrollbar {
+  width: 3px;
+}
+.media-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.media-content::-webkit-scrollbar-thumb {
+  background: var(--bg-hover);
+  border-radius: 3px;
+}
+
+/* ── Section ── */
+.media-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.media-section-title {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 0 var(--space-1);
+}
+
+/* ── Drop Zone ── */
+.media-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  user-select: none;
+  position: relative;
+}
+
+.media-drop-zone:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.media-drop-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.08);
+  transform: scale(1.01);
+}
+
+.media-drop-icon {
+  font-size: 32px;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.media-drop-text {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.media-drop-hint {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+}
+
+/* ── Toolbar ── */
+.media-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.media-filter-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.media-filter-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: 9px;
+  font-weight: 500;
+  padding: 3px 4px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  font-family: var(--font-ui);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.media-filter-btn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.media-filter-btn.active {
+  background: var(--accent-glow);
+  color: var(--accent-hover);
+  font-weight: 600;
+}
+
+.media-action-btn {
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: 10px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+  font-family: var(--font-ui);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.media-action-btn:hover {
+  color: var(--accent-hover);
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.media-action-btn.danger:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* ── Gallery Grid ── */
+.media-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+}
+
+.media-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+
+.media-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.media-item:active {
+  transform: translateY(0);
+}
+
+.media-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--bg-ground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.media-thumb img,
+.media-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media-thumb-icon {
+  font-size: 28px;
+  opacity: 0.6;
+}
+
+.media-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.media-item:hover .media-thumb-overlay {
+  opacity: 1;
+}
+
+.media-thumb-overlay span {
+  font-size: 10px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.media-info-row {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-1) var(--space-2);
+  gap: 1px;
+}
+
+.media-file-name {
+  font-size: 9px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.media-file-meta {
+  font-size: 8px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.media-delete-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: #fff;
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.12s, background 0.12s;
+  padding: 0;
+  z-index: 2;
+}
+
+.media-item:hover .media-delete-btn {
+  opacity: 1;
+}
+
+.media-delete-btn:hover {
+  background: var(--danger);
+}
+
+/* ── Empty State ── */
+.media-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-3);
+  gap: var(--space-1);
+  text-align: center;
+  user-select: none;
+}
+
+.media-empty-icon {
+  font-size: 36px;
+  opacity: 0.3;
+}
+
+.media-empty-text {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.media-empty-hint {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+}
+
+/* ── Info Bar ── */
+.media-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-1) var(--space-2);
+  font-size: 9px;
+  color: var(--text-tertiary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+/* ── Video Player Section ── */
+.media-player-section {
+  background: var(--bg-ground);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.media-player-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.media-player-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-player-area video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+
+.media-player-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+
+.media-player-placeholder-icon {
+  font-size: 32px;
+  opacity: 0.4;
+}
+
+/* ── Progress bar for uploads ── */
+.media-upload-progress {
+  width: 100%;
+  height: 3px;
+  background: var(--bg-hover);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: var(--space-1);
+}
+
+.media-upload-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s var(--ease-out);
+  width: 0%;
+}
+
+/* ── Media standalone button ── */
+.media-standalone-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--text-secondary, #9399b2);
+  background: var(--bg-hover, #313244);
+  transition: background 0.12s, color 0.12s;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.media-standalone-btn:hover {
+  color: var(--accent, #4f46e5);
+  background: var(--bg-active, #45475a);
+}
+
+/* ── Media AI toggle ── */
+.media-ai-toggle {
+  background: none;
+  border: 1px solid var(--border-default, #313244);
+  padding: 0 6px;
+  height: 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-secondary, #9399b2);
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+.media-ai-toggle:hover {
+  background: var(--bg-hover, #313244);
+  color: var(--accent, #4f46e5);
+}
+
+/* ── Media AI panel ── */
+.media-ai-panel {
+  border-top: 1px solid var(--border-default, #313244);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+.media-ai-panel.hidden { display: none; }
+.media-ai-response {
+  padding: 8px;
+  font-size: 11px;
+  color: var(--text-primary, #cdd6f4);
+  min-height: 40px;
+  max-height: 100px;
+  overflow-y: auto;
+  line-height: 1.5;
+  background: var(--bg-elevated, #181825);
+}
+.media-ai-input-row {
+  display: flex;
+  border-top: 1px solid var(--border-default, #313244);
+}
+.media-ai-input-row input {
+  flex: 1;
+  border: none;
+  padding: 6px 8px;
+  font-size: 11px;
+  outline: none;
+  background: var(--bg-surface, #1e1e2e);
+  color: var(--text-primary, #cdd6f4);
+}
+.media-ai-input-row button {
+  border: none;
+  background: var(--accent, #4f46e5);
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.media-ai-input-row button:hover {
+  background: var(--accent-hover, #4338ca);
+}
+
+/* ── Light theme ── */
+[data-theme="light"] .media-drop-zone {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .media-thumb-overlay {
+  background: rgba(0, 0, 0, 0.15);
+}
