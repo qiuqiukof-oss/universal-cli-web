@@ -4,7 +4,8 @@
   <strong>浏览器中的终端中枢 · 运行任何 CLI，连接任何 Agent</strong><br>
   <em>Terminal hub in browser — run any CLI, connect any agent</em>
 </p>
-<img width="2549" height="1191" alt="d31f5083-4920-4280-ab54-c63e369f7b75" src="https://github.com/user-attachments/assets/ba2ce74d-7f0c-4dd3-9559-b93f826bc5b3" />
+<img width="2559" height="1440" alt="image" src="https://github.com/user-attachments/assets/7df71242-0069-4727-939d-a87da57004c5" />
+
 
 ## 概述 | Overview
 
